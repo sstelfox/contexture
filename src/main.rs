@@ -24,7 +24,9 @@ async fn main() {
     tracing::info!("starting up dotfile fuse system");
 
     let mut cli_args = Arguments::from_env();
-    let mount_point: PathBuf = cli_args.value_from_str("--mount").expect("mount path");
+    let mount_point: PathBuf = cli_args
+        .value_from_str("--mount")
+        .unwrap_or(PathBuf::from("./mount"));
 
     if !mount_point.is_dir() {
         tracing::error!("mountpoint must be a directory");
