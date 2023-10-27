@@ -80,6 +80,7 @@ version = "0.1.0"
 dependencies = [
  "dashmap",
  "futures",
+ "libc",
  "pico-args",
  "polyfuse",
  "thiserror",
