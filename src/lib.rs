@@ -21,7 +21,7 @@ impl ContextureFs {
 
         let session = AsyncSession::mount(self.mount_path.clone(), kernel_config)
             .await
-            .expect("mount to succeed");
+            .map_err(ContextureFsError::MountFailed)?;
 
         while let Some(request) = session.next_request().await.expect("req to be present") {
             let inner_fs = self.inner_fs.clone();
@@ -73,7 +73,10 @@ impl Default for InnerFs {
 }
 
 #[derive(Debug, thiserror::Error)]
-pub enum ContextureFsError {}
+pub enum ContextureFsError {
+    #[error("failed to mount filesystem. Are the fuse libraries available?")]
+    MountFailed(std::io::Error),
+}
 
 pub(crate) struct AsyncSession {
     inner: tokio::io::unix::AsyncFd<polyfuse::Session>,
