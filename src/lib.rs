@@ -1,23 +1,41 @@
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::time::Duration;
 
 pub struct ContextureFs {
     mount_path: PathBuf,
+
+    cache_time: Option<Duration>,
+
     inner_fs: Arc<InnerFs>,
 }
 
 impl ContextureFs {
     pub fn new(mount_path: PathBuf) -> Self {
         let inner_fs = Arc::new(InnerFs);
+
         Self {
             mount_path,
+            cache_time: None,
             inner_fs,
         }
     }
 
+    pub fn cache_time(&mut self, cache_time: Duration) {
+        self.cache_time = Some(cache_time);
+    }
+
     pub async fn run(&self) -> Result<(), ContextureFsError> {
         let mut kernel_config = polyfuse::KernelConfig::default();
+
         kernel_config.mount_option("nonempty");
+        kernel_config.mount_option("default_permissions");
+        kernel_config.mount_option(&format!("fsname={}", env!("CARGO_PKG_NAME")));
+        kernel_config.mount_option("subtype=intdots");
+
+        kernel_config.export_support(true);
+        kernel_config.flock_locks(true);
+        kernel_config.writeback_cache(self.cache_time.is_some());
 
         let session = AsyncSession::mount(self.mount_path.clone(), kernel_config)
             .await

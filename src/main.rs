@@ -2,9 +2,10 @@ use std::path::PathBuf;
 
 use pico_args::Arguments;
 use tracing::Level;
+use tracing_subscriber::{EnvFilter, Layer};
+use tracing_subscriber::fmt::format::FmtSpan;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::{EnvFilter, Layer};
 
 use contexture::ContextureFs;
 
@@ -15,10 +16,20 @@ async fn main() {
     let env_filter = EnvFilter::builder()
         .with_default_directive(Level::INFO.into())
         .from_env_lossy();
-    let stdout_layer = tracing_subscriber::fmt::layer()
+
+    let mut log_builder = tracing_subscriber::fmt::layer()
         .compact()
-        .with_writer(non_blocking_writer)
-        .with_filter(env_filter);
+        .with_ansi(false)
+        .with_writer(non_blocking_writer);
+
+    if cfg!(debug_assertions) {
+        log_builder = log_builder.with_file(true)
+            .with_ansi(true)
+            .with_line_number(true)
+            .with_span_events(FmtSpan::ACTIVE);
+    }
+
+    let stdout_layer = log_builder.with_filter(env_filter);
     tracing_subscriber::registry().with(stdout_layer).init();
 
     tracing::info!("starting up dotfile fuse system");
