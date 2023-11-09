@@ -2,6 +2,8 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
 
+pub(crate) mod macros;
+
 pub(crate) mod file_system;
 pub(crate) mod inode_table;
 
