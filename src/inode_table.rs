@@ -1,5 +1,7 @@
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
+
+use tokio::sync::Mutex;
 
 use crate::inode::{Ino, INode, SrcId};
 
@@ -10,6 +12,10 @@ pub(crate) struct INodeTable {
 }
 
 impl INodeTable {
+    pub(crate) fn get(&self, ino: &Ino) -> Option<Arc<Mutex<INode>>> {
+        self.inodes.get(ino).cloned()
+    }
+
     pub(crate) fn new() -> Self {
         INodeTable {
             inodes: HashMap::new(),

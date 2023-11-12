@@ -7,7 +7,7 @@ pub(crate) struct INode {
     ino: Ino,
     src_id: SrcId,
 
-    fd: FileDescriptor,
+    pub(crate) fd: FileDescriptor,
 
     is_symlink: bool,
     ref_count: u64,
