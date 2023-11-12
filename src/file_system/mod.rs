@@ -2,34 +2,37 @@ pub(crate) mod file_descriptor;
 
 pub(crate) use file_descriptor::FileDescriptor;
 
-use std::sync::Mutex;
 use std::time::Duration;
+
+use tokio::sync::Mutex;
 
 use crate::inode_table::INodeTable;
 
 pub(crate) struct FileSystem {
-    //timeout: Option<Duration>,
-    //inodes: std::sync::Mutex<INodeTable>,
+    timeout: Option<Duration>,
+    inodes: Mutex<INodeTable>,
 }
 
 impl FileSystem {
-    pub(crate) fn get_attr(
+    pub(crate) async fn get_attr(
         &self,
         request: &polyfuse::Request,
         _operation: polyfuse::op::Getattr<'_>,
     ) -> Result<(), GetAttrError> {
+        let _inode_table = self.inodes.lock().await;
+
         // for now we don't know about anything
         request
             .reply_error(libc::ENOENT)
             .map_err(GetAttrError::ReplyFailed)
     }
 
-    pub(crate) fn new(_timeout: Option<Duration>) -> Self {
-        let _inodes = Mutex::new(INodeTable::new());
+    pub(crate) fn new(timeout: Option<Duration>) -> Self {
+        let inodes = Mutex::new(INodeTable::new());
 
         Self {
-            //timeout,
-            //inodes,
+            timeout,
+            inodes,
         }
     }
 }

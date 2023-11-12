@@ -8,18 +8,19 @@ rust-version = "1.70"
 pico-args = "^0.5"
 thiserror = "^1"
 
+askama = "^0.12"
 dashmap = "^5"
+libc = "^0.2"
 polyfuse = "^0.4"
 time = "^0.3"
 
 futures = "^0.3"
-tokio = { version = "^1", features = ["fs", "macros", "net", "rt-multi-thread", "signal", "time", "tracing"] }
+tokio = { version = "^1", features = ["fs", "macros", "net", "rt-multi-thread", "signal", "sync", "time", "tracing"] }
 
 tracing = { version = "^0.1", features = ["max_level_debug", "release_max_level_info"] }
 tracing-appender = "^0.2"
 tracing-futures = "^0.2"
 tracing-subscriber = { version = "^0.3", features = ["ansi", "env-filter", "fmt", "local-time", "time", "tracing"] }
-libc = "^0.2"
 
 [lib]
 path = "src/lib.rs"

@@ -73,7 +73,7 @@ async fn handle_request(
     let _enter = span.enter();
 
     match operation {
-        polyfuse::Operation::Getattr(op) => fs.get_attr(&request, op)?,
+        polyfuse::Operation::Getattr(op) => fs.get_attr(&request, op).await?,
         //polyfuse::Operation::Lookup(_op) => {
         //    todo!()
         //}
